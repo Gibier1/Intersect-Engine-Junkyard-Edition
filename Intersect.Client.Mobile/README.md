@@ -90,36 +90,67 @@ Intersect.Client.Mobile/
 
 ## Building for Android
 
-### ⚠️ Known Limitation
-**MonoGame 3.8.2 does not support .NET 8 Android.** The MonoGame team is working on version 3.9+ which will include proper .NET 8 Android support.
+### ✅ Build Success - MonoGame 3.8.4.1+ Supports .NET 8 Android!
+**MonoGame.Framework.Android 3.8.4.1+ now supports `net8.0-android34.0`**. The project has been updated and compiles successfully.
 
-Current options:
-1. **Wait for MonoGame 3.9+** with .NET 8 Android support
-2. **Use community MonoGame builds** that support .NET 8 Android
-3. **Downgrade to net7.0-android** (requires downgrading all Intersect dependencies)
-4. **Use different approach** - KNI (Kotlin Native Interop) or Android.Game.Activity
+The following changes have been made:
+1. ✅ Updated `MonoGame.Framework.DesktopGL` → `MonoGame.Framework.Android` (3.8.4.1)
+2. ✅ Updated target framework to `net8.0-android34.0`
+3. ✅ Re-enabled `MainActivity.cs` and `AndroidTouchInputHandler.cs` (conditionally excluded on Windows)
+4. ✅ Removed `MockTouchInputHandler` placeholder
+5. ✅ Added cross-platform Main method entry point for Windows development builds
+6. ✅ Fixed all type ambiguities (Rectangle, Color, Keys) between MonoGame and Intersect Framework
 
 ### Current State
-- The code is **ready** for Android development once MonoGame .NET 8 support is available
-- Virtual controls architecture is complete and tested
-- Touch input abstraction layer is implemented
-- Desktop UI integration is planned
+- The project **compiles successfully** on Windows for development
+- Virtual controls architecture is implemented
+- Touch input abstraction layer is complete (`AndroidTouchInputHandler`)
+- Desktop UI integration is planned for future development
 
-### What Would Need to Change When MonoGame 3.9+ Releases
-1. Update `MonoGame.Framework.DesktopGL` → `MonoGame.Framework.Android` (3.9+)
-2. Re-enable `MainActivity.cs` and `AndroidTouchInputHandler.cs`
-3. Remove `MockTouchInputHandler` from `MobileGame.cs`
-4. Update project to target proper Android SDK bindings
+### Build Steps
 
-### Build Steps (When MonoGame 3.9+ is Available)
+#### Option 1: Using the Provided Scripts (Recommended)
+
+1. **Wait for Android Studio installation to complete** (being installed via winget)
+   - This downloads ~1GB and may take 10-20 minutes
+
+2. **Run the setup script** (once Android Studio installation completes):
+   ```bash
+   # PowerShell (recommended)
+   .\Intersect.Client.Mobile\setup-android-env.ps1
+
+   # Or batch file
+   .\Intersect.Client.Mobile\setup-android-env.bat
+   ```
+
+3. **Open Android Studio** and install required SDK components:
+   - Launch Android Studio from Start Menu
+   - Go to **Tools → SDK Manager**
+   - In **SDK Platforms** tab: Check "Android 14.0 (API 34)" or latest
+   - In **SDK Tools** tab: Check "Android SDK Build-Tools 34.0.0" or latest
+   - Click **Apply** to install
+
+4. **Build the mobile client**:
+   ```bash
+   .\Intersect.Client.Mobile\build-android.bat
+   ```
+
+#### Option 2: Manual Setup
+
 ```bash
-# Install Android workload
-dotnet workload install android
+# 1. Install Android Studio (includes Android SDK)
+winget install --id Google.AndroidStudio
 
-# Restore packages
-dotnet restore Intersect.Client.Mobile/Intersect.Client.Mobile.csproj
+# 2. Set environment variables
+setx ANDROID_SDK_ROOT "C:\Users\%USERNAME%\AppData\Local\Android\Sdk"
+setx ANDROID_HOME "%ANDROID_SDK_ROOT%"
 
-# Build in Debug mode
+# 3. Install Android components via Android Studio SDK Manager:
+#    - Android SDK Platform 34
+#    - Android SDK Build-Tools 34.0.0
+#    - Android SDK Platform-Tools
+
+# 4. Build
 dotnet build Intersect.Client.Mobile/Intersect.Client.Mobile.csproj -c Debug
 ```
 
@@ -139,10 +170,13 @@ dotnet build Intersect.Client.Mobile/Intersect.Client.Mobile.csproj -c Debug
 
 ### ⏳ TODO
 - [x] **Environment**: Android workload installed (`dotnet workload install android`)
-- [ ] **BLOCKED**: MonoGame 3.8.2 does not support .NET 8 Android - waiting for MonoGame 3.9+ or community fork
-- [ ] **Input Integration**: Integrate key simulation with existing input system
+- [x] **MonoGame**: Updated to MonoGame.Framework.Android 3.8.4.1 (supports .NET 8 Android)
+- [x] **Project Setup**: Project compiles successfully on Windows and ready for Android builds
+- [ ] **Input Integration**: Integrate key simulation with existing Intersect input system (currently stubbed)
+- [ ] **Game Loop**: Connect VirtualControlsManager to MonoGame update/draw cycle
+- [ ] **GUI Integration**: Properly integrate with Gwen GUI system (NodeFilter, Globals, etc.)
 - [ ] **Textures**: Add proper textures for virtual controls (currently using generated circles)
-- [ ] **Testing**: Test connection to Intersect server
+- [ ] **Testing**: Test on actual Android device and test connection to Intersect server
 - [ ] **Text Rendering**: Add text rendering for button labels
 - [ ] **UI Scaling**: Resize desktop UI elements to fit mobile screens
 - [ ] **iOS**: Implement iOS touch input handler

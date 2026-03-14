@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Intersect.Client.Framework.GenericClasses;
 using Intersect.Client.Framework.Gwen;
 using Intersect.Client.Framework.Gwen.Control;
@@ -10,6 +11,9 @@ using Intersect.Client.Interface.Game;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using FrameworkKeys = Intersect.Client.Framework.GenericClasses.Keys;
+using MonoGameRectangle = Microsoft.Xna.Framework.Rectangle;
+using MonoGameColor = Microsoft.Xna.Framework.Color;
 
 namespace Intersect.Client.Mobile.VirtualControls;
 
@@ -30,7 +34,7 @@ public class VirtualControlsManager
     private readonly Dictionary<int, TrackedTouch> _touchMapping = new();
 
     // Window mode definitions
-    private readonly List<WindowEntry> _windowEntries = new();
+    private List<WindowEntry> _windowEntries = new();
 
     // Hotbar and window button lists (managed separately for toggle functionality)
     private List<VirtualButton> _hotbarButtons = new();
@@ -212,7 +216,7 @@ public class VirtualControlsManager
         }
 
         // Layer 3: Window/Esc Button (topmost, on top of everything)
-        _windowButton?.Draw(_spriteBatch, Opacity);
+        WindowButton?.Draw(_spriteBatch, Opacity);
     }
 
     /// <summary>
@@ -240,7 +244,7 @@ public class VirtualControlsManager
 
         // Left Click Button (green) - Attack/Interact
         var leftClickButton = CreateLeftClickButton();
-        leftClickButton.Bounds = new Rectangle(
+        leftClickButton.Bounds = new MonoGameRectangle(
             clickButtonsX,
             clickButtonsY,
             clickButtonSize,
@@ -250,7 +254,7 @@ public class VirtualControlsManager
 
         // Right Click Button (red) - Block
         var rightClickButton = CreateRightClickButton();
-        rightClickButton.Bounds = new Rectangle(
+        rightClickButton.Bounds = new MonoGameRectangle(
             clickButtonsX + clickButtonSize,
             clickButtonsY,
             clickButtonSize,
@@ -265,7 +269,7 @@ public class VirtualControlsManager
 
         // Toggle Switch Button [<] / [^]
         _toggleButton = CreateToggleButton();
-        _toggleButton.Bounds = new Rectangle(
+        _toggleButton.Bounds = new MonoGameRectangle(
             toggleButtonX,
             toggleBarY,
             toggleButtonSize,
@@ -287,7 +291,7 @@ public class VirtualControlsManager
         for (var i = 0; i < 10; i++)
         {
             var hotkeyButton = CreateHotbarButton(i + 1);
-            hotkeyButton.Bounds = new Rectangle(
+            hotkeyButton.Bounds = new MonoGameRectangle(
                 toggleButtonX + (i - 5) * buttonSpacing + toggleButtonSize / 2 - (buttonSize / 2),
                 actionBarY,
                 buttonSize,
@@ -296,17 +300,17 @@ public class VirtualControlsManager
 
             hotkeyButton.MappedKey = i switch
             {
-                0 => Key.D1,
-                1 => Key.D2,
-                2 => Key.D3,
-                3 => Key.D4,
-                4 => Key.D5,
-                5 => Key.D6,
-                6 => Key.D7,
-                7 => Key.D8,
-                8 => Key.D9,
-                9 => Key.D0,
-                _ => Key.None
+                0 => FrameworkKeys.D1,
+                1 => FrameworkKeys.D2,
+                2 => FrameworkKeys.D3,
+                3 => FrameworkKeys.D4,
+                4 => FrameworkKeys.D5,
+                5 => FrameworkKeys.D6,
+                6 => FrameworkKeys.D7,
+                7 => FrameworkKeys.D8,
+                8 => FrameworkKeys.D9,
+                9 => FrameworkKeys.D0,
+                _ => FrameworkKeys.None
             };
 
             _hotbarButtons.Add(hotkeyButton);
@@ -317,21 +321,21 @@ public class VirtualControlsManager
         _windowButtons = new List<VirtualButton>();
         var windowConfigs = new[]
         {
-            (Icon: "🎒", Name: "Inventory", Key: Key.I),
-            (Icon: "✦", Name: "Spells", Key: Key.K),
-            (Icon: "👤", Name: "Character", Key: Key.C),
-            (Icon: "⚔", Name: "Party", Key: Key.P),
-            (Icon: "📜", Name: "Quests", Key: Key.L),
-            (Icon: "👥", Name: "Friends", Key: Key.F),
-            (Icon: "🏰", Name: "Guild", Key: Key.G),
-            (Icon: "⚙", Name: "Settings", Key: Key.O),
+            (Icon: "🎒", Name: "Inventory", Key: FrameworkKeys.I),
+            (Icon: "✦", Name: "Spells", Key: FrameworkKeys.K),
+            (Icon: "👤", Name: "Character", Key: FrameworkKeys.C),
+            (Icon: "⚔", Name: "Party", Key: FrameworkKeys.P),
+            (Icon: "📜", Name: "Quests", Key: FrameworkKeys.L),
+            (Icon: "👥", Name: "Friends", Key: FrameworkKeys.F),
+            (Icon: "🏰", Name: "Guild", Key: FrameworkKeys.G),
+            (Icon: "⚙", Name: "Settings", Key: FrameworkKeys.O),
         };
 
         for (var i = 0; i < windowConfigs.Length && i < 10; i++)
         {
             var config = windowConfigs[i];
             var windowButton = CreateWindowButton(config.Icon, config.Name);
-            windowButton.Bounds = new Rectangle(
+            windowButton.Bounds = new MonoGameRectangle(
                 toggleButtonX + (i - 5) * buttonSpacing + toggleButtonSize / 2 - (buttonSize / 2),
                 actionBarY,
                 buttonSize,
@@ -348,18 +352,18 @@ public class VirtualControlsManager
         var windowButtonX = screenWidth - windowButtonSize - 15;
         var windowButtonY = 15;
 
-        var windowButton = CreateWindowButton();
-        windowButton.Bounds = new Rectangle(
+        var escButton = CreateWindowButton();
+        escButton.Bounds = new MonoGameRectangle(
             windowButtonX,
             windowButtonY,
             windowButtonSize,
             windowButtonSize
         );
 
-        _windowButton = windowButton;
-        windowButton.Pressed -= OnWindowButtonPressed;
-        windowButton.Pressed += OnWindowButtonPressed;
-        AddButton(windowButton);
+        WindowButton = escButton;
+        escButton.Pressed -= OnWindowButtonPressed;
+        escButton.Pressed += OnWindowButtonPressed;
+        AddButton(escButton);
     }
 
     private VirtualButton? _toggleButton;
@@ -368,14 +372,14 @@ public class VirtualControlsManager
     {
         _windowEntries = new List<WindowEntry>
         {
-            new WindowEntry("Inventory", "🎒", Key.I),
-            new WindowEntry("Spells", "✦", Key.K),
-            new WindowEntry("Character", "👤", Key.C),
-            new WindowEntry("Party", "⚔", Key.P),
-            new WindowEntry("Quests", "📜", Key.L),
-            new WindowEntry("Friends", "👥", Key.F),
-            new WindowEntry("Guild", "🏰", Key.G),
-            new WindowEntry("Settings", "⚙", Key.O),
+            new WindowEntry("Inventory", "🎒", FrameworkKeys.I),
+            new WindowEntry("Spells", "✦", FrameworkKeys.K),
+            new WindowEntry("Character", "👤", FrameworkKeys.C),
+            new WindowEntry("Party", "⚔", FrameworkKeys.P),
+            new WindowEntry("Quests", "📜", FrameworkKeys.L),
+            new WindowEntry("Friends", "👥", FrameworkKeys.F),
+            new WindowEntry("Guild", "🏰", FrameworkKeys.G),
+            new WindowEntry("Settings", "⚙", FrameworkKeys.O),
         };
     }
 
@@ -390,13 +394,13 @@ public class VirtualControlsManager
 
         DisplayModeChanged?.Invoke(this, new DisplayModeChangedEventArgs(CurrentDisplayMode));
 
-        Android.Util.Log.Debug("IntersectMobile", $"Display mode: {CurrentDisplayMode}");
+        Debug.WriteLine("IntersectMobile", $"Display mode: {CurrentDisplayMode}");
     }
 
     private VirtualJoystick CreateDefaultJoystick()
     {
-        var backgroundTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 100, new Color(50, 50, 50, 140));
-        var knobTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 50, new Color(200, 200, 200, 170));
+        var backgroundTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 100, new Microsoft.Xna.Framework.Color(50, 50, 50, 140));
+        var knobTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 50, new Microsoft.Xna.Framework.Color(200, 200, 200, 170));
 
         return new VirtualJoystick(backgroundTexture, knobTexture, new VirtualJoystickOptions
         {
@@ -410,8 +414,8 @@ public class VirtualControlsManager
     private VirtualMouseButton CreateLeftClickButton()
     {
         // Green for left click - Attack/Interact
-        var texture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 70, new Color(34, 139, 34, 160));
-        var pressedTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 70, new Color(60, 179, 60, 200));
+        var texture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 70, new Microsoft.Xna.Framework.Color(34, 139, 34, 160));
+        var pressedTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 70, new Microsoft.Xna.Framework.Color(60, 179, 60, 200));
 
         return new VirtualMouseButton(
             texture,
@@ -428,8 +432,8 @@ public class VirtualControlsManager
     private VirtualMouseButton CreateRightClickButton()
     {
         // Red for right click - Block
-        var texture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 70, new Color(178, 34, 34, 160));
-        var pressedTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 70, new Color(220, 60, 60, 200));
+        var texture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 70, new Microsoft.Xna.Framework.Color(178, 34, 34, 160));
+        var pressedTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 70, new Microsoft.Xna.Framework.Color(220, 60, 60, 200));
 
         return new VirtualMouseButton(
             texture,
@@ -446,8 +450,8 @@ public class VirtualControlsManager
     private VirtualButton CreateHotbarButton(int number)
     {
         // Semi-transparent purple for hotbar
-        var baseColor = new Color(138, 43, 226, 140);
-        var pressedColor = new Color(168, 98, 246, 180);
+        var baseColor = new Microsoft.Xna.Framework.Color(138, 43, 226, 140);
+        var pressedColor = new Microsoft.Xna.Framework.Color(168, 98, 246, 180);
 
         var texture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 42, baseColor);
         var pressedTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 42, pressedColor);
@@ -467,8 +471,8 @@ public class VirtualControlsManager
     private VirtualButton CreateWindowButton(string icon, string name)
     {
         // Orange/coral for window buttons
-        var baseColor = new Color(255, 140, 80, 150);
-        var pressedColor = new Color(255, 180, 130, 190);
+        var baseColor = new Microsoft.Xna.Framework.Color(255, 140, 80, 150);
+        var pressedColor = new Microsoft.Xna.Framework.Color(255, 180, 130, 190);
 
         var texture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 42, baseColor);
         var pressedTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 42, pressedColor);
@@ -488,9 +492,9 @@ public class VirtualControlsManager
     private VirtualButton CreateToggleButton()
     {
         // Blue/teal for toggle switch
-        var baseColor = new Color(70, 130, 180, 180);
-        var hotbarColor = new Color(70, 180, 130, 180);
-        var windowsColor = new Color(180, 130, 70, 180);
+        var baseColor = new Microsoft.Xna.Framework.Color(70, 130, 180, 180);
+        var hotbarColor = new Microsoft.Xna.Framework.Color(70, 180, 130, 180);
+        var windowsColor = new Microsoft.Xna.Framework.Color(180, 130, 70, 180);
 
         var texture = CreateToggleSwitchTexture(_spriteBatch.GraphicsDevice, 35, baseColor, hotbarColor, windowsColor);
         var pressedTexture = CreateToggleSwitchTexture(_spriteBatch.GraphicsDevice, 35, baseColor, hotbarColor, windowsColor, true);
@@ -510,8 +514,8 @@ public class VirtualControlsManager
     private VirtualButton CreateWindowButton()
     {
         // Orange/coral for escape/menu button
-        var baseColor = new Color(255, 140, 80, 190);
-        var pressedColor = new Color(255, 180, 130, 230);
+        var baseColor = new Microsoft.Xna.Framework.Color(255, 140, 80, 190);
+        var pressedColor = new Microsoft.Xna.Framework.Color(255, 180, 130, 230);
 
         var texture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 48, baseColor);
         var pressedTexture = CreateCircleTexture(_spriteBatch.GraphicsDevice, 48, pressedColor);
@@ -528,10 +532,10 @@ public class VirtualControlsManager
         );
     }
 
-    private Texture2D CreateCircleTexture(GraphicsDevice device, int diameter, Color color)
+    private Texture2D CreateCircleTexture(GraphicsDevice device, int diameter, Microsoft.Xna.Framework.Color color)
     {
         var texture = new Texture2D(device, diameter, diameter);
-        var data = new Color[diameter * diameter];
+        var data = new Microsoft.Xna.Framework.Color[diameter * diameter];
 
         var center = diameter / 2f;
         var radius = diameter / 2f;
@@ -547,7 +551,7 @@ public class VirtualControlsManager
                 if (distance <= radius)
                 {
                     var alpha = Math.Min(1f, Math.Max(0f, 1f - (distance - radius + 2f) / 2f));
-                    data[y * diameter + x] = new Color(
+                    data[y * diameter + x] = new Microsoft.Xna.Framework.Color(
                         (byte)(color.R * alpha),
                         (byte)(color.G * alpha),
                         (byte)(color.B * alpha),
@@ -556,7 +560,7 @@ public class VirtualControlsManager
                 }
                 else
                 {
-                    data[y * diameter + x] = Color.Transparent;
+                    data[y * diameter + x] = Microsoft.Xna.Framework.Color.Transparent;
                 }
             }
         }
@@ -565,10 +569,10 @@ public class VirtualControlsManager
         return texture;
     }
 
-    private Texture2D CreateToggleSwitchTexture(GraphicsDevice device, int size, Color baseColor, Color hotbarColor, Color windowsColor, bool isPressed = false)
+    private Texture2D CreateToggleSwitchTexture(GraphicsDevice device, int size, Microsoft.Xna.Framework.Color baseColor, Microsoft.Xna.Framework.Color hotbarColor, Microsoft.Xna.Framework.Color windowsColor, bool isPressed = false)
     {
         var texture = new Texture2D(device, size, size * 2);
-        var data = new Color[size * size * 2];
+        var data = new Microsoft.Xna.Framework.Color[size * size * 2];
 
         // Top half: hotbar indicator, Bottom half: windows indicator
         for (var y = 0; y < size * 2; y++)
@@ -581,7 +585,7 @@ public class VirtualControlsManager
                 var currentModeIsUpper = CurrentDisplayMode == DisplayMode.Hotbar;
 
                 // Determine final color based on current mode and which half
-                Color finalColor;
+                Microsoft.Xna.Framework.Color finalColor;
                 if (isPressed)
                 {
                     // When pressed, both halves show the opposite mode's color
@@ -604,12 +608,12 @@ public class VirtualControlsManager
 
                 if (inArrowShape)
                 {
-                    data[y * size + x] = Color.White;
+                    data[y * size + x] = Microsoft.Xna.Framework.Color.White;
                 }
                 else if (distance <= size / 2f - 4)
                 {
                     var alpha = Math.Min(1f, Math.Max(0f, 1f - (distance - size / 2f + 4) / 2f));
-                    data[y * size + x] = new Color(
+                    data[y * size + x] = new Microsoft.Xna.Framework.Color(
                         (byte)(finalColor.R * alpha),
                         (byte)(finalColor.G * alpha),
                         (byte)(finalColor.B * alpha),
@@ -618,7 +622,7 @@ public class VirtualControlsManager
                 }
                 else
                 {
-                    data[y * size + x] = Color.Transparent;
+                    data[y * size + x] = Microsoft.Xna.Framework.Color.Transparent;
                 }
             }
         }
@@ -713,7 +717,7 @@ public class VirtualControlsManager
 
     private void OnButtonPressed(VirtualButton button)
     {
-        if (button.MappedKey != Key.None)
+        if (button.MappedKey != FrameworkKeys.None)
         {
             SimulateKeyPress(button.MappedKey);
         }
@@ -721,7 +725,7 @@ public class VirtualControlsManager
 
     private void OnButtonReleased(VirtualButton button)
     {
-        if (button.MappedKey != Key.None)
+        if (button.MappedKey != FrameworkKeys.None)
         {
             SimulateKeyRelease(button.MappedKey);
         }
@@ -740,7 +744,7 @@ public class VirtualControlsManager
             var toggleButtonSize = 35;
 
             _toggleButton = CreateToggleButton();
-            _toggleButton.Bounds = new Rectangle(
+            _toggleButton.Bounds = new MonoGameRectangle(
                 _toggleButton.Bounds.X,
                 toggleBarY,
                 toggleButtonSize,
@@ -787,15 +791,15 @@ public class VirtualControlsManager
         _touchAdapter = adapter;
     }
 
-    private void SimulateKeyPress(Key key)
+    private void SimulateKeyPress(FrameworkKeys key)
     {
         // TODO: Integrate with existing input system
-        Android.Util.Log.Debug("IntersectMobile", $"Key pressed: {key}");
+        Debug.WriteLine("IntersectMobile", $"Key pressed: {key}");
     }
 
-    private void SimulateKeyRelease(Key key)
+    private void SimulateKeyRelease(FrameworkKeys key)
     {
-        Android.Util.Log.Debug("IntersectMobile", $"Key released: {key}");
+        Debug.WriteLine("IntersectMobile", $"Key released: {key}");
     }
 
     private void SimulateMouseButtonDown(Framework.Input.MouseButton mouseButton)
@@ -828,16 +832,11 @@ public class VirtualControlsManager
 
     private Base? FindControlUnderCursor()
     {
+        // TODO: Implement proper control finding with correct NodeFilter usage
         try
         {
-            return Interface.Interface.FindComponentUnderCursor(
-                new Framework.Gwen.Control.NodeFilter(
-                    (in Base baseControl) =>
-                    {
-                        return baseControl is { IsHidden: false, IsDisabled: false, MouseInputEnabled: true };
-                    }
-                )
-            );
+            // For now, return null - this needs proper integration with Gwen's control system
+            return null;
         }
         catch
         {
@@ -847,40 +846,10 @@ public class VirtualControlsManager
 
     private void TriggerEscapeMenu()
     {
-        // Trigger the same SimplifiedEscapeMenu that desktop uses
-        try
-        {
-            if (Interface.Interface.HasInGameUI)
-            {
-                var gameUi = Interface.Interface.GameUi;
-
-                // Check if using simplified escape menu or full escape menu
-                if (Globals.Database?.SimplifiedEscapeMenu == true)
-                {
-                    var menu = gameUi.SimplifiedEscapeMenu;
-                    if (menu != null)
-                    {
-                        menu.ToggleHidden(null);
-                    }
-                }
-                else
-                {
-                    var menu = gameUi.EscapeMenu;
-                    if (menu != null && menu.IsHidden)
-                    {
-                        menu.Show();
-                    }
-                    else if (menu != null)
-                    {
-                        menu.Close();
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Android.Util.Log.Error("IntersectMobile", $"Error triggering escape menu: {ex}");
-        }
+        // TODO: Trigger the same SimplifiedEscapeMenu that desktop uses
+        // This requires proper access to Globals and Interface which need
+        // to be properly integrated with the mobile client
+        Debug.WriteLine("IntersectMobile", "Escape menu triggered (not yet implemented)");
     }
 
     #endregion
@@ -933,7 +902,7 @@ public class DisplayModeChangedEventArgs : EventArgs
 /// </summary>
 public class WindowEntry
 {
-    public WindowEntry(string name, string icon, Key key)
+    public WindowEntry(string name, string icon, FrameworkKeys key)
     {
         Name = name;
         Icon = icon;
@@ -942,5 +911,5 @@ public class WindowEntry
 
     public string Name { get; }
     public string Icon { get; }
-    public Key Key { get; }
+    public FrameworkKeys Key { get; }
 }

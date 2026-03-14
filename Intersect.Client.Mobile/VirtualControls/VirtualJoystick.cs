@@ -3,6 +3,8 @@ using Intersect.Client.Framework.GenericClasses;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGameRectangle = Microsoft.Xna.Framework.Rectangle;
+using MonoGameColor = Microsoft.Xna.Framework.Color;
 
 namespace Intersect.Client.Mobile.VirtualControls;
 
@@ -78,7 +80,9 @@ public class VirtualJoystick
         }
 
         // Check if touch is within the joystick's bounds
-        var distance = Point.Distance(position, _position);
+        var dx = position.X - _position.X;
+        var dy = position.Y - _position.Y;
+        var distance = (float)Math.Sqrt(dx * dx + dy * dy);
         if (distance <= _options.TouchRadius)
         {
             _isActive = true;
@@ -137,25 +141,25 @@ public class VirtualJoystick
         // Draw background
         spriteBatch.Draw(
             _backgroundTexture,
-            new Rectangle(
+            new MonoGameRectangle(
                 _position.X - _backgroundTexture.Width / 2,
                 _position.Y - _backgroundTexture.Height / 2,
                 _backgroundTexture.Width,
                 _backgroundTexture.Height
             ),
-            new Color(255, 255, 255, (byte)(255 * opacity * (_options.IsVisible ? 1f : 0.5f)))
+            new Microsoft.Xna.Framework.Color((byte)255, (byte)255, (byte)255, (byte)(255 * opacity * (_options.IsVisible ? 1f : 0.5f)))
         );
 
         // Draw knob
         spriteBatch.Draw(
             _knobTexture,
-            new Rectangle(
+            new MonoGameRectangle(
                 _knobPosition.X - _knobTexture.Width / 2,
                 _knobPosition.Y - _knobTexture.Height / 2,
                 _knobTexture.Width,
                 _knobTexture.Height
             ),
-            new Color(255, 255, 255, (byte)(255 * opacity * (_isActive ? 1f : 0.5f)))
+            new Microsoft.Xna.Framework.Color((byte)255, (byte)255, (byte)255, (byte)(255 * opacity * (_isActive ? 1f : 0.5f)))
         );
     }
 

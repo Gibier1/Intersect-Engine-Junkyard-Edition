@@ -10,9 +10,15 @@ namespace Intersect.Client.Mobile;
 
 /// <summary>
 /// Main Android Activity for the Intersect Client.
-/// Note: This is a placeholder implementation. The actual MonoGame Android integration
-/// requires AndroidGameActivity from MonoGame.Framework.Android which is not compatible
-/// with .NET 8 Android. This will need to be updated when MonoGame adds proper .NET 8 support.
+///
+/// NOTE: MonoGame.Framework.Android 3.8.4.1+ supports .NET 8 Android (net8.0-android34.0).
+/// The integration can now proceed with proper MonoGame Android support.
+///
+/// TODO when implementing full Android integration:
+/// 1. Use AndroidGameActivity from MonoGame.Framework.Android
+/// 2. Initialize MobileGame with proper Android context
+/// 3. Set up touch input with AndroidTouchInputHandler
+/// 4. Integrate virtual controls with the game loop
 /// </summary>
 [Activity(
     Label = "@string/app_name",
@@ -42,26 +48,14 @@ public class MainActivity : Activity
 
         SetContentView(_frameLayout);
 
-        // TODO: Initialize the game when MonoGame .NET 8 Android support is available
+        // TODO: Initialize MobileGame when full MonoGame Android integration is complete
         // For now, show a placeholder message
         var textView = new TextView(this)
         {
-            Text = "Intersect Mobile\n\nMonoGame .NET 8 Android integration is pending.\nPlease use the desktop client or wait for MonoGame update.",
+            Text = "Intersect Mobile\n\nMonoGame Android integration is in progress.\nVirtual controls architecture is complete.\nDesktop UI will be preserved as-is.",
             Gravity = GravityFlags.Center
         };
         _frameLayout.AddView(textView);
-    }
-
-    protected override void OnResume()
-    {
-        base.OnResume();
-        _game?.Resume();
-    }
-
-    protected override void OnPause()
-    {
-        base.OnPause();
-        _game?.Pause();
     }
 
     protected override void OnDestroy()

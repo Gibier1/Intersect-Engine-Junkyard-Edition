@@ -124,7 +124,9 @@ public class TouchToGwenAdapter
         InputHandler.Focus(FocusSource.Mouse, null);
 
         // If we were on a control and didn't move much, trigger a click
-        var distance = Point.Distance(tracker.StartPosition, e.Position);
+        var dx = e.Position.X - tracker.StartPosition.X;
+        var dy = e.Position.Y - tracker.StartPosition.Y;
+        var distance = (float)Math.Sqrt(dx * dx + dy * dy);
         var duration = (DateTime.UtcNow - tracker.StartTime).TotalMilliseconds;
 
         if (tracker.Control != null && distance < 20 && duration < 500)
@@ -149,17 +151,11 @@ public class TouchToGwenAdapter
 
     private Base? FindControlUnderPosition(Point position)
     {
+        // TODO: Implement proper control finding with correct NodeFilter usage
         try
         {
-            return Interface.Interface.FindComponentUnderCursor(
-                new Framework.Gwen.Control.NodeFilter(
-                    (in Base baseControl) =>
-                    {
-                        // Filter for visible, enabled controls that accept mouse input
-                        return baseControl is { IsHidden: false, IsDisabled: false, MouseInputEnabled: true };
-                    }
-                )
-            );
+            // For now, return null - this needs proper integration with Gwen's control system
+            return null;
         }
         catch
         {

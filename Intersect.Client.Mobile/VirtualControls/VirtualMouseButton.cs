@@ -2,6 +2,8 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGameRectangle = Microsoft.Xna.Framework.Rectangle;
+using MonoGameColor = Microsoft.Xna.Framework.Color;
 
 namespace Intersect.Client.Mobile.VirtualControls;
 
@@ -52,7 +54,7 @@ public class VirtualMouseButton
     public Point Position
     {
         get => new Point(_bounds.X, _bounds.Y);
-        set => _bounds = new Rectangle(value.X, value.Y, _bounds.Width, _bounds.Height);
+        set => _bounds = new MonoGameRectangle(value.X, value.Y, _bounds.Width, _bounds.Height);
     }
 
     /// <summary>
@@ -146,7 +148,7 @@ public class VirtualMouseButton
         }
 
         var scale = 1f - (_pressAnimation * _options.PressScaleAmount);
-        var scaledBounds = new Rectangle(
+        var scaledBounds = new MonoGameRectangle(
             _bounds.Center.X - (int)(_bounds.Width * scale / 2),
             _bounds.Center.Y - (int)(_bounds.Height * scale / 2),
             (int)(_bounds.Width * scale),
@@ -155,7 +157,7 @@ public class VirtualMouseButton
 
         var currentTexture = _pressedTexture != null && _isPressed ? _pressedTexture : _texture;
         var baseOpacity = _options.IsVisible || _isPressed ? 1f : 0.3f;
-        var color = new Color(255, 255, 255, (byte)(255 * opacity * baseOpacity));
+        var color = new Microsoft.Xna.Framework.Color((byte)255, (byte)255, (byte)255, (byte)(255 * opacity * baseOpacity));
 
         spriteBatch.Draw(currentTexture, scaledBounds, color);
 

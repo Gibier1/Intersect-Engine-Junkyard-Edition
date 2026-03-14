@@ -6,21 +6,22 @@ using Intersect.Client.Framework.GenericClasses;
 using Intersect.Client.General;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGameColor = Microsoft.Xna.Framework.Color;
 
 namespace Intersect.Client.Mobile;
 
 /// <summary>
 /// Main MonoGame class for the mobile version of Intersect Client.
 ///
-/// NOTE: This is a placeholder implementation pending proper MonoGame .NET 8 Android support.
-/// The MonoGame.Framework.Android package (3.8.2) is not compatible with .NET 8 Android.
+/// NOTE: MonoGame.Framework.Android 3.8.4.1+ supports .NET 8 Android.
+/// The Android touch input (AndroidTouchInputHandler) is now available.
 ///
-/// TODO when MonoGame 3.9+ with .NET 8 Android support is available:
-/// 1. Switch from DesktopGL to Android MonoGame framework
-/// 2. Re-enable MainActivity.cs with proper Android activity
-/// 3. Re-enable AndroidTouchInputHandler.cs
-/// 4. Restore full MobileGame implementation
-/// 5. Initialize real touch input
+/// TODO for full integration:
+/// 1. Create MonoRenderer and MonoInput
+/// 2. Initialize Gwen with mobile touch support
+/// 3. Initialize VirtualControlsManager with AndroidTouchInputHandler
+/// 4. Integrate with existing game loop
+/// 5. Pass unhandled touch events to desktop UI
 /// </summary>
 public sealed class MobileGame : Game
 {
@@ -105,7 +106,7 @@ public sealed class MobileGame : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        GraphicsDevice.Clear(MonoGameColor.CornflowerBlue);
 
         base.Draw(gameTime);
 
@@ -121,29 +122,15 @@ public sealed class MobileGame : Game
 }
 
 /// <summary>
-/// Mock touch input handler for compilation purposes.
-/// Real Android touch input will be implemented when MonoGame .NET 8 Android support is available.
+/// Entry point for Windows development builds.
+/// On Android, MainActivity.cs provides the entry point and this is ignored.
 /// </summary>
-internal class MockTouchInputHandler : ITouchInputHandler
+public static class Program
 {
-    public Point PrimaryTouchPosition => new Point(0, 0);
-    public bool IsTouching => false;
-    public int TouchCount => 0;
-
-    public event EventHandler<TouchEventArgs>? TouchStarted;
-    public event EventHandler<TouchEventArgs>? TouchMoved;
-    public event EventHandler<TouchEventArgs>? TouchEnded;
-    public event EventHandler<TouchEventArgs>? LongPressDetected;
-    public event EventHandler<TouchEventArgs>? TapDetected;
-    public event EventHandler<PinchEventArgs>? PinchStarted;
-    public event EventHandler<PinchEventArgs>? PinchChanged;
-    public event EventHandler<PinchEventArgs>? PinchEnded;
-
-    public void Update()
+    [STAThread]
+    public static void Main()
     {
-    }
-
-    public void Reset()
-    {
+        using var game = new MobileGame();
+        game.Run();
     }
 }
