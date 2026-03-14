@@ -1,0 +1,91 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <!-- Suppress EOL warning as error for development -->
+    <NoWarn>$(NoWarn);NETSDK1202</NoWarn>
+    <ApplicationId>com.intersectengine.client</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>0.8.0</ApplicationDisplayVersion>
+    <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
+    <AndroidCreatePerfNetwork>true</AndroidCreatePerfNetwork>
+
+    <!-- MonoGame Properties -->
+    <MonoGamePlatform>Android</MonoGamePlatform>
+    <MonoGameContentBuilderRoot>Content</MonoGameContentBuilderRoot>
+
+    <!-- Android Manifest Properties -->
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;ANDROID;MOBILE</DefineConstants>
+    <MandroidI18n>West</MandroidI18n>
+    <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>RELEASE;ANDROID;MOBILE</DefineConstants>
+    <MandroidI18n>West</MandroidI18n>
+    <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Intersect (Core)\Intersect.Core.csproj" />
+    <ProjectReference Include="..\Intersect.Client.Core\Intersect.Client.Core.csproj" />
+    <ProjectReference Include="..\Intersect.Client.Framework\Intersect.Client.Framework.csproj" />
+    <ProjectReference Include="..\Intersect.Network\Intersect.Network.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- MonoGame - using DesktopGL for cross-platform compatibility -->
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105" />
+    <!-- Additional dependencies -->
+    <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.2.1105" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Memory" Version="4.6.0" />
+    <PackageReference Include="System.IO.Hashing" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Android Resources -->
+    <AndroidResource Include="Resources\**\*" />
+  </ItemGroup>
+
+  <!-- Exclude Android-specific files until MonoGame .NET 8 Android support is available -->
+  <ItemGroup>
+    <Compile Remove="Platforms\Android\AndroidTouchInputHandler.cs" />
+    <Compile Remove="MainActivity.cs" />
+    <None Include="Platforms\Android\AndroidTouchInputHandler.cs" />
+    <None Include="MainActivity.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Assets -->
+    <AndroidAsset Include="Assets\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Native Libraries included via MonoGame -->
+  </ItemGroup>
+
+  <Target Name="EnsureMonoGameContentBuilderExists" BeforeTargets="Build">
+    <!-- Placeholder for content build if needed -->
+  </Target>
+
+</Project>
