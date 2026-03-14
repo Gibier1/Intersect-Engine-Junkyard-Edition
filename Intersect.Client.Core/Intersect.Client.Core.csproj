@@ -3,6 +3,8 @@
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputType>Library</OutputType>
+    <TargetFrameworks>net8.0;net8.0-android34.0</TargetFrameworks>
+    <NoWarn>$(NoWarn);NETSDK1202</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -40,7 +42,7 @@
     <EmbeddedResource Include="Resources\Shaders\radialgradient.xnb" />
   </ItemGroup>
 
-  <ItemGroup Label="Package Embedded Resources">
+  <ItemGroup Label="Package Embedded Resources" Condition="'$(TargetFramework)' != 'net8.0-android34.0'">
     <EmbeddedResource Include="$(PkgMonoGame_Framework_DesktopGL)\lib\net8.0\MonoGame.Framework.dll">
       <Link>Resources\MonoGame.Framework.dll</Link>
     </EmbeddedResource>
@@ -87,9 +89,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105" GeneratePathProperty="True" />
-    <PackageReference Include="MonoGame.Library.SDL" Version="2.30.7.1" GeneratePathProperty="True" />
-    <PackageReference Include="Steamworks.NET" Version="2024.8.0" />
+    <!-- DesktopGL MonoGame for Windows/Linux/Mac -->
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105" GeneratePathProperty="True" Condition="'$(TargetFramework)' != 'net8.0-android34.0'" />
+    <PackageReference Include="MonoGame.Library.SDL" Version="2.30.7.1" GeneratePathProperty="True" Condition="'$(TargetFramework)' != 'net8.0-android34.0'" />
+    <!-- Android MonoGame -->
+    <PackageReference Include="MonoGame.Framework.Android" Version="3.8.4.1" Condition="'$(TargetFramework)' == 'net8.0-android34.0'" />
+    <!-- Steamworks (not supported on Android) -->
+    <PackageReference Include="Steamworks.NET" Version="2024.8.0" Condition="'$(TargetFramework)' != 'net8.0-android34.0'" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <Nullable>warnings</Nullable>
+        <TargetFrameworks>net8.0;net8.0-android34.0</TargetFrameworks>
+        <NoWarn>$(NoWarn);NETSDK1202</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

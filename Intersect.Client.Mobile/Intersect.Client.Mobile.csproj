@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0-android34.0</TargetFramework>
     <TargetPlatformVersion>34.0</TargetPlatformVersion>
+    <RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
@@ -47,10 +48,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Explicitly reference the Android target framework of dependencies -->
     <ProjectReference Include="..\Intersect (Core)\Intersect.Core.csproj" />
     <ProjectReference Include="..\Intersect.Client.Core\Intersect.Client.Core.csproj" />
     <ProjectReference Include="..\Intersect.Client.Framework\Intersect.Client.Framework.csproj" />
     <ProjectReference Include="..\Intersect.Network\Intersect.Network.csproj" />
+    <ProjectReference Include="..\Framework\Intersect.Framework.Core\Intersect.Framework.Core.csproj" />
+    <ProjectReference Include="..\Framework\Intersect.Framework\Intersect.Framework.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,18 +72,8 @@
     <AndroidResource Include="Resources\**\*" />
   </ItemGroup>
 
-  <!-- Exclude Android-specific files when building on Windows from command line.
-       They will be included when building through Visual Studio with Mobile workload or when AndroidBuild is true.
-       Visual Studio with Mobile workload sets $(BuildingInsideVisualStudio) and has Android APIs available. -->
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT' AND '$(BuildingInsideVisualStudio)' != 'true' AND '$(AndroidBuild)' != 'true'">
-    <Compile Remove="Platforms\Android\AndroidTouchInputHandler.cs" />
-    <Compile Remove="MainActivity.cs" />
-  </ItemGroup>
-
-  <!-- Android-specific files are included when:
-       1. Building inside Visual Studio with Mobile workload
-       2. AndroidBuild property is explicitly set
-       3. Building on Unix systems (CI/CD) -->
+  <!-- Android-specific files are now included when building for Android target framework.
+       Dependencies are multi-targeted (net8.0 + net8.0-android34.0), so Android APIs are available. -->
 
   <ItemGroup>
     <!-- Assets -->
@@ -95,3 +89,4 @@
   </Target>
 
 </Project>
+

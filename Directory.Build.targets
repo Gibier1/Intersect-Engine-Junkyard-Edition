@@ -1,0 +1,14 @@
+<Project>
+
+  <!--
+    Android Build Targets
+  -->
+
+  <!-- Override the target platform version inference for Android library projects -->
+  <Target Name="_GetDefaultTargetPlatformVersion" AfterTargets="_GetInstalledDotNetRuntimeVersions" BeforeTargets="_GetTargetPlatformIdentifier" Condition="'$(BuildingForAndroid)' == 'true' AND '$(IsAndroidMultiTargetedProject)' == 'true'">
+    <PropertyGroup>
+      <TargetPlatformVersion>34.0</TargetPlatformVersion>
+    </PropertyGroup>
+  </Target>
+
+</Project>

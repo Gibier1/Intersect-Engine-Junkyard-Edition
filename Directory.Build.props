@@ -20,4 +20,36 @@
     <NetworkHandshakePrivateKey>$(NetworkKeyOutputDir)\network.handshake.bkey</NetworkHandshakePrivateKey>
   </PropertyGroup>
 
+  <!--
+    Android Build Configuration
+    Forces dependencies to use Android target framework when building mobile project
+  -->
+
+  <!-- Detect when building for Android and set the flag for dependency projects -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Intersect.Client.Mobile' OR '$(BuildingForAndroid)' == 'true'">
+    <BuildingForAndroid>true</BuildingForAndroid>
+  </PropertyGroup>
+
+  <!--
+    List of projects that are multi-targeted with Android support.
+    When BuildingForAndroid=true, these projects will build only for Android.
+  -->
+  <PropertyGroup Condition="'$(BuildingForAndroid)' == 'true'">
+    <IsAndroidMultiTargetedProject Condition="'$(MSBuildProjectName)' == 'Intersect.Framework'">true</IsAndroidMultiTargetedProject>
+    <IsAndroidMultiTargetedProject Condition="'$(MSBuildProjectName)' == 'Intersect.Framework.Core'">true</IsAndroidMultiTargetedProject>
+    <IsAndroidMultiTargetedProject Condition="'$(MSBuildProjectName)' == 'Intersect.Core'">true</IsAndroidMultiTargetedProject>
+    <IsAndroidMultiTargetedProject Condition="'$(MSBuildProjectName)' == 'Intersect.Network'">true</IsAndroidMultiTargetedProject>
+    <IsAndroidMultiTargetedProject Condition="'$(MSBuildProjectName)' == 'Intersect.Client.Framework'">true</IsAndroidMultiTargetedProject>
+    <IsAndroidMultiTargetedProject Condition="'$(MSBuildProjectName)' == 'Intersect.Client.Core'">true</IsAndroidMultiTargetedProject>
+  </PropertyGroup>
+
+  <!-- When BuildingForAndroid is set, override multi-targeted projects to use Android only -->
+  <PropertyGroup Condition="'$(BuildingForAndroid)' == 'true' AND '$(IsAndroidMultiTargetedProject)' == 'true'">
+    <TargetFramework>net8.0-android34.0</TargetFramework>
+    <TargetFrameworks></TargetFrameworks>
+    <!-- Downgrade the platform version validation error to a warning -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NETSDK1135</WarningsNotAsErrors>
+    <NoWarn>$(NoWarn);NETSDK1135;NETSDK1202</NoWarn>
+  </PropertyGroup>
+
 </Project>
